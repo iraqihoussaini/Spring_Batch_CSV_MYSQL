@@ -34,10 +34,10 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
 		if(jobExecution.getStatus() == BatchStatus.COMPLETED) {
 			log.info("!!! JOB FINISHED! Time to verify the results");
 			
-			List<Personne> results = jdbcTemplate.query("SELECT first_name, last_name,email,societe,remarques,mobile FROM person", new RowMapper<Personne>() {
+			List<Personne> results = jdbcTemplate.query("SELECT prenom, nom,email,societe,tel FROM contact", new RowMapper<Personne>() {
 				@Override
 				public Personne mapRow(ResultSet rs, int row) throws SQLException {
-					return new Personne(rs.getString(1), rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6));
+					return new Personne(rs.getString(1), rs.getString(2),rs.getString(3),rs.getString(4),rs.getString(5));
 				}
 			});
 

@@ -6,42 +6,42 @@ import java.io.Serializable;
 public class Personne implements Serializable{
 
 	private static final long serialVersionUID = -6402068923614583448L;
-	private String firstName;
-    private String lastName;
+	private String prenom;
+    private String nom;
     private String email;
     private String societe;
-    private String remarques;
-    private String mobile;
+    private String tel;
   
    
     
     public Personne() {
 	}
 
-	public Personne(String firstName, String lastName, String email, String societe, String remarques, String mobile) {
+	public Personne(String prenom, String nom, String email, String societe, String tel) {
 		super();
-		this.firstName = firstName;
-		this.lastName = lastName;
+		this.prenom = prenom;
+		this.nom = nom;
 		this.email = email;
 		this.societe = societe;
-		this.remarques = remarques;
-		this.mobile = mobile;
+		this.tel = tel;
 	}
 
-	public String getFirstName() {
-		return firstName;
+
+
+	public String getPrenom() {
+		return prenom;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setPrenom(String prenom) {
+		this.prenom = prenom;
 	}
 
-	public String getLastName() {
-		return lastName;
+	public String getNom() {
+		return nom;
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setNom(String nom) {
+		this.nom = nom;
 	}
 
 	public String getEmail() {
@@ -60,27 +60,22 @@ public class Personne implements Serializable{
 		this.societe = societe;
 	}
 
-	public String getRemarques() {
-		return remarques;
+
+	public String getTel() {
+		return tel;
 	}
 
-	public void setRemarques(String remarques) {
-		this.remarques = remarques;
-	}
-
-	public String getMobile() {
-		return mobile;
-	}
-
-	public void setMobile(String mobile) {
-		this.mobile = mobile;
+	public void setTel(String tel) {
+		this.tel = tel;
 	}
 
 	@Override
 	public String toString() {
-		return "Personne [firstName=" + firstName + ", lastName=" + lastName + ", email=" + email + ", societe="
-				+ societe + ", remarques=" + remarques + ", mobile=" + mobile + "]";
+		return "Personne [prenom=" + prenom + ", nom=" + nom + ", email=" + email + ", societe=" + societe + ", tel="
+				+ tel + "]";
 	}
+
+	
 
 	
 }

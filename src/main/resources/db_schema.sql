@@ -1,11 +1,10 @@
-DROP TABLE IF EXISTS person;
+DROP TABLE IF EXISTS contact;
 
-CREATE TABLE person  (
-    person_id BIGINT auto_increment NOT NULL PRIMARY KEY,
-    first_name VARCHAR(40),
-    last_name VARCHAR(40),
+CREATE TABLE contact  (
+    id BIGINT auto_increment NOT NULL PRIMARY KEY,
+    prenom VARCHAR(40),
+    nom VARCHAR(40),
     email VARCHAR(100),
     societe VARCHAR(50),
-    remarques VARCHAR(100),
-    mobile VARCHAR(20)
+    tel VARCHAR(20)
 );

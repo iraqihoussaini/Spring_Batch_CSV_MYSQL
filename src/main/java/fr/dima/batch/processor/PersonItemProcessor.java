@@ -14,10 +14,10 @@ public class PersonItemProcessor implements ItemProcessor<Personne, Personne> {
 
     @Override
     public Personne process(final Personne person) throws Exception {
-        final String firstName = person.getFirstName().toUpperCase();
-        final String lastName = person.getLastName().toUpperCase();
+        final String prenom = person.getPrenom().toUpperCase();
+        final String nom = person.getNom().toUpperCase();
 
-        final Personne transformedPerson = new Personne(firstName, lastName,person.getEmail(),person.getSociete(),person.getRemarques(),person.getMobile());
+        final Personne transformedPerson = new Personne(prenom, nom,person.getEmail(),person.getSociete(),person.getTel());
 
         log.info("Converting (" + person + ") into (" + transformedPerson + ")");
 
