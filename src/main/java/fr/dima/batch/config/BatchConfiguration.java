@@ -1,5 +1,7 @@
 package fr.dima.batch.config;
 
+import java.applet.AppletContext;
+
 import javax.sql.DataSource;
 
 
@@ -16,9 +18,12 @@ import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import fr.dima.batch.listener.JobCompletionNotificationListener;
 import fr.dima.batch.model.Personne;
@@ -41,11 +46,14 @@ public class BatchConfiguration {
   
     @Bean
     public FlatFileItemReader<Personne> reader() {
+    	
         FlatFileItemReader<Personne> reader = new FlatFileItemReader<Personne>();
-        reader.setResource(new ClassPathResource("fichierAIntegrer.csv"));
+        ApplicationContext appContext = new ClassPathXmlApplicationContext(new String[] {});
+        Resource resource = appContext.getResource("file:e:\\fichierAIntegrer.csv");
         reader.setLineMapper(new DefaultLineMapper<Personne>() {{
-            setLineTokenizer(new DelimitedLineTokenizer(";") {{
-                setNames(new String[] { "prenom", "nom","email","societe","tel" });
+        reader.setResource(resource);
+        setLineTokenizer(new DelimitedLineTokenizer(";") {{
+        	setNames(new String[] { "prenom", "nom","email","societe","tel" });
             }});
             setFieldSetMapper(new BeanWrapperFieldSetMapper<Personne>() {{
                 setTargetType(Personne.class);
