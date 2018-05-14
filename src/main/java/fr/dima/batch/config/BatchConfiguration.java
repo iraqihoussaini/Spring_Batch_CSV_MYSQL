@@ -1,9 +1,11 @@
 package fr.dima.batch.config;
 
-import java.applet.AppletContext;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
 
 import javax.sql.DataSource;
-
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -22,77 +24,92 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import fr.dima.batch.listener.JobCompletionNotificationListener;
 import fr.dima.batch.model.Personne;
 import fr.dima.batch.processor.PersonItemProcessor;
 
-
-
 @Configuration
 @EnableBatchProcessing
 public class BatchConfiguration {
 
-    @Autowired
-    public JobBuilderFactory jobBuilderFactory;
+	@Autowired
+	public JobBuilderFactory jobBuilderFactory;
 
-    @Autowired
-    public StepBuilderFactory stepBuilderFactory;
+	@Autowired
+	public StepBuilderFactory stepBuilderFactory;
 
-    @Autowired
-    public DataSource dataSource;
-  
-    @Bean
-    public FlatFileItemReader<Personne> reader() {
-    	
-        FlatFileItemReader<Personne> reader = new FlatFileItemReader<Personne>();
-        ApplicationContext appContext = new ClassPathXmlApplicationContext(new String[] {});
-        Resource resource = appContext.getResource("file:e:\\fichierAIntegrer.csv");
-        reader.setLineMapper(new DefaultLineMapper<Personne>() {{
-        reader.setResource(resource);
-        setLineTokenizer(new DelimitedLineTokenizer(";") {{
-        	setNames(new String[] { "prenom", "nom","email","societe","tel" });
-            }});
-            setFieldSetMapper(new BeanWrapperFieldSetMapper<Personne>() {{
-                setTargetType(Personne.class);
-            }});
-        }});
-        return reader;
-    }
+	@Autowired
+	public DataSource dataSource;
 
-    @Bean
-    public PersonItemProcessor processor() {
-        return new PersonItemProcessor();
-    }
+	@Bean
+	public FlatFileItemReader<Personne> reader() throws FileNotFoundException, IOException {
+		File file = new File(System.getProperty("user.home") + "/ERP_DIMA/");
+		File[] files = file.listFiles(new FilenameFilter() {
 
-    @Bean
-    public JdbcBatchItemWriter<Personne> writer() {
-        JdbcBatchItemWriter<Personne> writer = new JdbcBatchItemWriter<Personne>();
-        writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Personne>());
-        writer.setSql("INSERT INTO contact (prenom, nom,email,societe,tel) VALUES (:prenom, :nom,:societe,:email,:tel)");
-        writer.setDataSource(dataSource);
-        return writer;
-    }
+			@Override
+			public boolean accept(File dir, String name) {
+				if (name.toLowerCase().endsWith(".csv")) {
+					return true;
+				} else {
+					return false;
+				}
+			}
+		});
+		for (File f : files) {
+			System.out.println(f.getPath());
+		}
+		System.out.println(files[0].getName());
+		System.out.println("file:" + System.getProperty("user.home") + "/ERP_DIMA/" + files[0].getName());
+		FlatFileItemReader<Personne> reader = new FlatFileItemReader<Personne>();
+		ApplicationContext appContext = new ClassPathXmlApplicationContext(new String[] {});
+		Resource resource = appContext
+				.getResource("file:" + System.getProperty("user.home") + "/ERP_DIMA/" + files[0].getName());
+		// reader.setResource(new ClassPathResource("fichierAIntegrer.csv"));
+		reader.setResource(resource);
+		reader.setLineMapper(new DefaultLineMapper<Personne>() {
+			{
+				setLineTokenizer(new DelimitedLineTokenizer(";") {
+					{
+						setNames(new String[] { "nom", "prenom", "email", "societe", "tel" });
+					}
+				});
+				setFieldSetMapper(new BeanWrapperFieldSetMapper<Personne>() {
+					{
+						setTargetType(Personne.class);
+					}
+				});
+			}
+		});
+		return reader;
+	}
 
-    @Bean
-    public Job importUserJob(JobCompletionNotificationListener listener) {
-        return jobBuilderFactory.get("importUserJob")
-                .incrementer(new RunIdIncrementer())
-                .listener(listener)
-                .flow(step1())
-                .end()
-                .build();
-    }
+	@Bean
+	public PersonItemProcessor processor() {
+		return new PersonItemProcessor();
+	}
 
-    @Bean
-    public Step step1() {
-        return stepBuilderFactory.get("step1")
-                .<Personne, Personne> chunk(10)
-                .reader(reader())
-                .processor(processor())
-                .writer(writer())
-                .build();
-    }
+	@Bean
+	public JdbcBatchItemWriter<Personne> writer() {
+		JdbcBatchItemWriter<Personne> writer = new JdbcBatchItemWriter<Personne>();
+		writer.setItemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<Personne>());
+		writer.setSql(
+				"INSERT INTO contact (email,nom, prenom,societe,tel) VALUES (:societe,:nom, :prenom,:email,:tel)");
+		writer.setDataSource(dataSource);
+		return writer;
+	}
+
+	@Bean
+	public Job importUserJob(JobCompletionNotificationListener listener) throws FileNotFoundException, IOException {
+		return jobBuilderFactory.get("importUserJob").incrementer(new RunIdIncrementer()).listener(listener)
+				.flow(step1()).end().build();
+	}
+
+	@Bean
+	public Step step1() throws FileNotFoundException, IOException {
+		return stepBuilderFactory.get("step1").<Personne, Personne>chunk(10).reader(reader()).processor(processor())
+				.writer(writer()).build();
+	}
+
 }
